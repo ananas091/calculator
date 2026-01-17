@@ -31,7 +31,7 @@ void print_usage(const char* program_name) {
     printf("  !    Факториал\n");
     printf("\n");
     printf("Примечание: в bash символ * нужно экранировать:\n");
-    printf("  %s 3 '*' 2   или   %s 3 \\* 2\n", program_name, program_name);
+    printf("%s 3 '*' 2   или   %s 3 \\* 2\n", program_name, program_name);
     printf("\n");
 }
 
@@ -89,7 +89,7 @@ int parse_arguments(int argc, char* argv[], CalculationData* data) {
     }
 
     if (check_help(argc, argv)) {
-        return 0;
+        return -1;
     }
 
     if (argc == 3) {
