@@ -32,6 +32,16 @@ add_executable(calculator src/main.cpp)
 target_link_libraries(calculator PRIVATE mathlib)
 
 include(GNUInstallDirs)
+
+set_target_properties(calculator PROPERTIES
+    INSTALL_RPATH "$ORIGIN/../${CMAKE_INSTALL_LIBDIR}"
+)
+
+install(TARGETS mathlib
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+
 install(TARGETS calculator RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 find_program(CLANG_TIDY_EXE NAMES clang-tidy)
