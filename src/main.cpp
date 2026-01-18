@@ -15,7 +15,7 @@ typedef struct {
     double second_number;
     Operation operation;
     double result;
-    MathError error;
+    mathlib::MathError error;
 } CalculationData;
 
 void print_usage(const char* program_name) {
@@ -57,7 +57,7 @@ static int check_help(int argc, char* argv[]) {
 
 void print_result(const CalculationData* data) {
     if (data->error) {
-        fprintf(stderr, "Ошибка: %s\n", math_error_string(data->error));
+        fprintf(stderr, "Ошибка: %s\n", mathlib::math_error_string(data->error));
         return;
     }
 
@@ -79,7 +79,7 @@ int parse_arguments(int argc, char* argv[], CalculationData* data) {
     data->second_number = 0.0;
     data->operation = OP_UNKNOWN;
     data->result = 0.0;
-    data->error = MATH_OK;
+    data->error = mathlib::MATH_OK;
 
     char* endptr;
 
@@ -187,35 +187,35 @@ int check_data(const CalculationData* data) {
 }
 
 void calculate(CalculationData* data) {
-    MathError err = MATH_OK;
+    mathlib::MathError err = mathlib::MATH_OK;
 
     switch (data->operation) {
         case OP_ADD:
-            err = math_add(data->first_number, data->second_number, &data->result);
+            err = mathlib::math_add(data->first_number, data->second_number, &data->result);
             break;
 
         case OP_SUB:
-            err = math_sub(data->first_number, data->second_number, &data->result);
+            err = mathlib::math_sub(data->first_number, data->second_number, &data->result);
             break;
 
         case OP_MUL:
-            err = math_mul(data->first_number, data->second_number, &data->result);
+            err = mathlib::math_mul(data->first_number, data->second_number, &data->result);
             break;
 
         case OP_DIV:
-            err = math_div(data->first_number, data->second_number, &data->result);
+            err = mathlib::math_div(data->first_number, data->second_number, &data->result);
             break;
 
         case OP_POW:
-            err = math_pow(data->first_number, data->second_number, &data->result);
+            err = mathlib::math_pow(data->first_number, data->second_number, &data->result);
             break;
 
         case OP_FACT:
-            err = math_factorial(data->first_number, &data->result);
+            err = mathlib::math_factorial(data->first_number, &data->result);
             break;
 
         default:
-            err = MATH_ERR_INVALID_ARG;
+            err = mathlib::MATH_ERR_INVALID_ARG;
             break;
     }
 
