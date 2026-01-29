@@ -27,7 +27,15 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(mathlib)
 
-add_executable(calculator src/main.cpp)
+add_executable(calculator 
+    src/main.cpp
+    src/parser.cpp
+    src/runner.cpp
+    src/checker.cpp
+    src/calculator.cpp
+    src/printer.cpp
+    )
+target_include_directories(calculator PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 target_link_libraries(calculator PRIVATE mathlib)
 
