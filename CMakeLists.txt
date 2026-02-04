@@ -25,7 +25,14 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/ananas091/mathlib.git
     GIT_TAG main
 )
-FetchContent_MakeAvailable(mathlib)
+
+FetchContent_Declare(
+    json
+    GIT_REPOSITORY https://github.com/nlohmann/json.git
+    GIT_TAG v3.12.0
+)
+
+FetchContent_MakeAvailable(mathlib json)
 
 add_executable(calculator 
     src/main.cpp
@@ -34,10 +41,10 @@ add_executable(calculator
     src/checker.cpp
     src/calculator.cpp
     src/printer.cpp
-    )
+)
 target_include_directories(calculator PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-target_link_libraries(calculator PRIVATE mathlib)
+target_link_libraries(calculator PRIVATE mathlib nlohmann_json::nlohmann_json)
 
 include(GNUInstallDirs)
 
