@@ -15,6 +15,7 @@
 Проект использует:
 - [MathLib](https://github.com/ananas091/mathlib) для безопасных математических вычислений с обнаружением переполнения
 - [nlohmann/json](https://github.com/nlohmann/json) для парсинга JSON
+- [Google Test](https://github.com/google/googletest) для тестов
 
 ## Формат входных данных
 
