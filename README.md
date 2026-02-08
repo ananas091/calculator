@@ -16,6 +16,7 @@
 - [MathLib](https://github.com/ananas091/mathlib) для безопасных математических вычислений с обнаружением переполнения
 - [nlohmann/json](https://github.com/nlohmann/json) для парсинга JSON
 - [Google Test](https://github.com/google/googletest) для тестов
+- [spdlog](https://github.com/gabime/spdlog) — для логирования
 
 ## Формат входных данных
 
@@ -58,6 +59,13 @@ cmake -DCMAKE_BUILD_TYPE=Debug ..
 cmake --build .
 ```
 
+## Тестирование
+
+```bash
+ctest --test-dir build
+```
+
+
 ### Установка
 
 ```bash
@@ -90,3 +98,7 @@ echo '{"operand1": 100, "operation": "/", "operand2": 4}' > input.json
 ./calculator -h
 ./calculator --help
 ```
+
+## Логирование
+
+Логи пишутся в `/tmp/calculator.log` с уровнем `debug`. Пример:

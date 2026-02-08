@@ -38,7 +38,13 @@ FetchContent_Declare(
     GIT_TAG v1.17.0
 )
 
-FetchContent_MakeAvailable(mathlib json googletest)
+FetchContent_Declare(
+    spdlog
+    GIT_REPOSITORY https://github.com/gabime/spdlog.git
+    GIT_TAG v1.17.0
+)
+
+FetchContent_MakeAvailable(mathlib json googletest spdlog)
 
 add_library(calculator_lib
     src/parser.cpp
@@ -46,9 +52,10 @@ add_library(calculator_lib
     src/checker.cpp
     src/calculator.cpp
     src/printer.cpp
+    src/logger.cpp
 )
 target_include_directories(calculator_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(calculator_lib PUBLIC mathlib nlohmann_json::nlohmann_json)
+target_link_libraries(calculator_lib PUBLIC mathlib nlohmann_json::nlohmann_json spdlog::spdlog)
 
 add_executable(calculator src/main.cpp)
 target_link_libraries(calculator PRIVATE calculator_lib)

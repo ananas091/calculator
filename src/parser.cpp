@@ -7,6 +7,8 @@
 #include <nlohmann/json.hpp>
 #include <sstream>
 
+#include "logger.hpp"
+
 Operation Parser::ParseOperation(const std::string& op_str) {
     if (op_str == "+") return Operation::OP_ADD;
     if (op_str == "-") return Operation::OP_SUB;
@@ -23,6 +25,9 @@ void Parser::ParseJson(const std::string& json_str, CalculationData& data) {
     data.operation = Operation::OP_UNKNOWN;
     data.result = 0.0;
     data.error = mathlib::MATH_OK;
+
+    auto& log = Logger::Instance().Get();
+    log->debug("парсинг JSON: {}", json_str);
 
     try {
         nlohmann::json j = nlohmann::json::parse(json_str);
@@ -58,6 +63,9 @@ void Parser::ParseJson(const std::string& json_str, CalculationData& data) {
             data.second_number = j["operand2"].get<double>();
         }
 
+        log->debug("парсинг успешен: operand1={}, operation='{}', operand2={}", data.first_number, op_str,
+                   data.second_number);
+
     } catch (const std::invalid_argument&) {
         throw;
     } catch (const nlohmann::json::parse_error& e) {
@@ -70,6 +78,9 @@ void Parser::ParseJson(const std::string& json_str, CalculationData& data) {
 }
 
 void Parser::ParseArguments(int argc, char* argv[], CalculationData& data) {
+    auto& log = Logger::Instance().Get();
+    log->info("парсинг аргументов");
+
     if (argc < 2) {
         throw std::invalid_argument(std::string("недостаточно аргументов. Используйте: ") + argv[0] +
                                     " -h или --help для подробной информации");
@@ -84,6 +95,7 @@ void Parser::ParseArguments(int argc, char* argv[], CalculationData& data) {
     if (argc == 2) {
         json_input = argv[1];
     } else if (argc == 3 && std::string(argv[1]) == "-f") {
+        log->info("чтение из файла: {}", argv[2]);
         std::ifstream file(argv[2]);
         if (!file.is_open()) {
             throw std::runtime_error(std::string("не удалось открыть файл '") + argv[2] + "'");

@@ -1,6 +1,11 @@
 #include "calculator.hpp"
 
+#include "logger.hpp"
+
 void Calculator::Calculate(CalculationData& data) {
+    auto& log = Logger::Instance().Get();
+    log->debug("выполнение вычисления");
+
     switch (data.operation) {
         case Operation::OP_ADD:
             data.error = mathlib::math_add(data.first_number, data.second_number, &data.result);
@@ -31,4 +36,6 @@ void Calculator::Calculate(CalculationData& data) {
     }
 
     if (data.error != mathlib::MATH_OK) throw std::runtime_error(mathlib::math_error_string(data.error));
+
+    log->debug("результат: {}", data.result);
 }

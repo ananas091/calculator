@@ -2,7 +2,12 @@
 
 #include <cmath>
 
+#include "logger.hpp"
+
 void Checker::CheckData(const CalculationData& data) {
+    auto& log = Logger::Instance().Get();
+    log->debug("валидация входных данных");
+
     if (data.operation == Operation::OP_UNKNOWN) {
         throw std::invalid_argument("операция не определена");
     }
@@ -31,4 +36,6 @@ void Checker::CheckData(const CalculationData& data) {
             throw std::invalid_argument("показатель степени должен быть целым числом");
         }
     }
+
+    log->debug("валидация пройдена");
 }
