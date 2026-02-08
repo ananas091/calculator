@@ -4,6 +4,5 @@
 
 class Checker {
 public:
-    int check_data(const CalculationData* data);
-private:
+    void CheckData(const CalculationData& data);
 };

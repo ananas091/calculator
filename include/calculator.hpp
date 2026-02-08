@@ -4,6 +4,5 @@
 
 class Calculator {
 public:
-    void calculate(CalculationData* data);
-private:
+    void Calculate(CalculationData& data);
 };

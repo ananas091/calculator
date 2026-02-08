@@ -1,23 +1,26 @@
 #include "runner.hpp"
 
+#include <iostream>
+
 #include "types.hpp"
 
-int Runner::run(int argc, char* argv[]) {
-    CalculationData data;
+int Runner::Run(int argc, char* argv[]) {
+    try {
+        CalculationData data;
 
-    if (int parser_code = _parser.parse_arguments(argc, argv, &data); parser_code < 0) {
-        if (parser_code == -2) {
-            _printer.print_usage(argv[0]);
-        }
+        _parser.ParseArguments(argc, argv, data);
+        _checker.CheckData(data);
+        _calculator.Calculate(data);
+        Printer::PrintResult(data);
+
+    } catch (const HelpRequestedException&) {
+        Printer::PrintUsage(argv[0]);
+        return 0;
+
+    } catch (const std::exception& e) {
+        Printer::PrintError(e.what());
         return 1;
     }
 
-    if (_checker.check_data(&data) < 0) {
-        return 1;
-    }
-
-    _calculator.calculate(&data);
-    _printer.print_result(&data);
-
-    return data.error ? 1 : 0;
+    return 0;
 }

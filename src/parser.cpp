@@ -2,13 +2,12 @@
 
 #include <getopt.h>
 
-#include <cstdio>
 #include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include <sstream>
 
-Operation Parser::parse_operation(const std::string& op_str) {
+Operation Parser::ParseOperation(const std::string& op_str) {
     if (op_str == "+") return Operation::OP_ADD;
     if (op_str == "-") return Operation::OP_SUB;
     if (op_str == "*") return Operation::OP_MUL;
@@ -18,76 +17,66 @@ Operation Parser::parse_operation(const std::string& op_str) {
     return Operation::OP_UNKNOWN;
 }
 
-int Parser::parse_json(const std::string& json_str, CalculationData* data) {
-    data->first_number = 0.0;
-    data->second_number = 0.0;
-    data->operation = Operation::OP_UNKNOWN;
-    data->result = 0.0;
-    data->error = mathlib::MATH_OK;
+void Parser::ParseJson(const std::string& json_str, CalculationData& data) {
+    data.first_number = 0.0;
+    data.second_number = 0.0;
+    data.operation = Operation::OP_UNKNOWN;
+    data.result = 0.0;
+    data.error = mathlib::MATH_OK;
 
     try {
         nlohmann::json j = nlohmann::json::parse(json_str);
 
         if (!j.contains("operation")) {
-            std::cerr << "Ошибка: отсутствует поле 'operation'\n";
-            return -1;
+            throw std::invalid_argument("отсутствует поле 'operation'");
         }
 
         std::string op_str = j["operation"].get<std::string>();
-        data->operation = parse_operation(op_str);
+        data.operation = ParseOperation(op_str);
 
-        if (data->operation == Operation::OP_UNKNOWN) {
-            std::cerr << "Ошибка: неизвестная операция '" << op_str << "'\n";
-            std::cerr << "Доступные операции: + - * / ^ !\n";
-            return -1;
+        if (data.operation == Operation::OP_UNKNOWN) {
+            throw std::invalid_argument("неизвестная операция '" + op_str + "'. Доступные операции: + - * / ^ !");
         }
 
         if (!j.contains("operand1")) {
-            std::cerr << "Ошибка: отсутствует поле 'operand1'\n";
-            return -1;
+            throw std::invalid_argument("отсутствует поле 'operand1'");
         }
 
         if (!j["operand1"].is_number()) {
-            std::cerr << "Ошибка: 'operand1' должен быть числом\n";
-            return -1;
+            throw std::invalid_argument("'operand1' должен быть числом");
         }
-        data->first_number = j["operand1"].get<double>();
+        data.first_number = j["operand1"].get<double>();
 
-        if (data->operation != Operation::OP_FACT) {
+        if (data.operation != Operation::OP_FACT) {
             if (!j.contains("operand2")) {
-                std::cerr << "Ошибка: отсутствует поле 'operand2' для бинарной операции\n";
-                return -1;
+                throw std::invalid_argument("отсутствует поле 'operand2' для бинарной операции");
             }
 
             if (!j["operand2"].is_number()) {
-                std::cerr << "Ошибка: 'operand2' должен быть числом\n";
-                return -1;
+                throw std::invalid_argument("'operand2' должен быть числом");
             }
-            data->second_number = j["operand2"].get<double>();
+            data.second_number = j["operand2"].get<double>();
         }
 
-        return 0;
-
+    } catch (const std::invalid_argument&) {
+        throw;
     } catch (const nlohmann::json::parse_error& e) {
-        std::cerr << "Ошибка парсинга JSON: " << e.what() << "\n";
-        return -1;
+        throw std::invalid_argument(std::string("ошибка парсинга JSON: ") + e.what());
     } catch (const nlohmann::json::type_error& e) {
-        std::cerr << "Ошибка типа JSON: " << e.what() << "\n";
-        return -1;
+        throw std::invalid_argument(std::string("ошибка типа JSON: ") + e.what());
     } catch (const std::exception& e) {
-        std::cerr << "Ошибка: " << e.what() << "\n";
-        return -1;
+        throw std::runtime_error(e.what());
     }
 }
 
-int Parser::parse_arguments(int argc, char* argv[], CalculationData* data) {
+void Parser::ParseArguments(int argc, char* argv[], CalculationData& data) {
     if (argc < 2) {
-        std::cout << "Используйте: " << argv[0] << " -h или --help для подробной информации\n";
-        return -1;
+        throw std::invalid_argument(std::string("недостаточно аргументов. Используйте: ") + argv[0] +
+                                    " -h или --help для подробной информации");
     }
 
-    if (check_help(argc, argv)) {
-        return -2;
+    if (CheckHelp(argc, argv)) {
+        throw HelpRequestedException();
     }
 
     std::string json_input;
@@ -97,22 +86,20 @@ int Parser::parse_arguments(int argc, char* argv[], CalculationData* data) {
     } else if (argc == 3 && std::string(argv[1]) == "-f") {
         std::ifstream file(argv[2]);
         if (!file.is_open()) {
-            std::cerr << "Ошибка: не удалось открыть файл '" << argv[2] << "'\n";
-            return -1;
+            throw std::runtime_error(std::string("не удалось открыть файл '") + argv[2] + "'");
         }
         std::stringstream buffer;
         buffer << file.rdbuf();
         json_input = buffer.str();
     } else {
-        std::cerr << "Ошибка: неправильное количество аргументов\n";
-        std::cout << "Используйте: " << argv[0] << " -h или --help для подробной информации\n";
-        return -1;
+        throw std::invalid_argument(std::string("неправильное количество аргументов. Используйте: ") + argv[0] +
+                                    " -h или --help для подробной информации");
     }
 
-    return parse_json(json_input, data);
+    ParseJson(json_input, data);
 }
 
-int Parser::check_help(int argc, char* argv[]) {
+bool Parser::CheckHelp(int argc, char* argv[]) {
     const char* optstring = "+hf:";
 
     static const struct option long_opts[] = {
@@ -124,10 +111,10 @@ int Parser::check_help(int argc, char* argv[]) {
     int opt;
     while ((opt = getopt_long(argc, argv, optstring, long_opts, nullptr)) != -1) {
         if (opt == 'h') {
-            return 1;
+            return true;
         }
     }
 
     optind = 1;
-    return 0;
+    return false;
 }
