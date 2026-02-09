@@ -5,8 +5,8 @@
 #include "logger.hpp"
 
 void Checker::CheckData(const CalculationData& data) {
-    auto& log = Logger::Instance().Get();
-    log->debug("валидация входных данных");
+    auto& log = Logger::Instance();
+    log.Debug("валидация входных данных");
 
     if (data.operation == Operation::OP_UNKNOWN) {
         throw std::invalid_argument("операция не определена");
@@ -37,5 +37,5 @@ void Checker::CheckData(const CalculationData& data) {
         }
     }
 
-    log->debug("валидация пройдена");
+    log.Debug("валидация пройдена");
 }

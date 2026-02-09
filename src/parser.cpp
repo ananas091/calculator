@@ -2,6 +2,7 @@
 
 #include <getopt.h>
 
+#include <format>
 #include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
@@ -26,8 +27,8 @@ void Parser::ParseJson(const std::string& json_str, CalculationData& data) {
     data.result = 0.0;
     data.error = mathlib::MATH_OK;
 
-    auto& log = Logger::Instance().Get();
-    log->debug("парсинг JSON: {}", json_str);
+    auto& log = Logger::Instance();
+    log.Debug(std::format("парсинг JSON: {}", json_str));
 
     try {
         nlohmann::json j = nlohmann::json::parse(json_str);
@@ -63,8 +64,8 @@ void Parser::ParseJson(const std::string& json_str, CalculationData& data) {
             data.second_number = j["operand2"].get<double>();
         }
 
-        log->debug("парсинг успешен: operand1={}, operation='{}', operand2={}", data.first_number, op_str,
-                   data.second_number);
+        log.Debug(std::format("парсинг успешен: operand1={}, operation='{}', operand2={}", data.first_number, op_str,
+                              data.second_number));
 
     } catch (const std::invalid_argument&) {
         throw;
@@ -78,8 +79,8 @@ void Parser::ParseJson(const std::string& json_str, CalculationData& data) {
 }
 
 void Parser::ParseArguments(int argc, char* argv[], CalculationData& data) {
-    auto& log = Logger::Instance().Get();
-    log->info("парсинг аргументов");
+    auto& log = Logger::Instance();
+    log.Debug("парсинг аргументов");
 
     if (argc < 2) {
         throw std::invalid_argument(std::string("недостаточно аргументов. Используйте: ") + argv[0] +
@@ -95,7 +96,7 @@ void Parser::ParseArguments(int argc, char* argv[], CalculationData& data) {
     if (argc == 2) {
         json_input = argv[1];
     } else if (argc == 3 && std::string(argv[1]) == "-f") {
-        log->info("чтение из файла: {}", argv[2]);
+        log.Debug(std::format("чтение из файла: {}", argv[2]));
         std::ifstream file(argv[2]);
         if (!file.is_open()) {
             throw std::runtime_error(std::string("не удалось открыть файл '") + argv[2] + "'");

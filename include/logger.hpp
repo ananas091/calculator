@@ -10,7 +10,9 @@ public:
         return self;
     }
 
-    std::shared_ptr<spdlog::logger>& Get() { return _logger; }
+    void Debug(const std::string& msg);
+    void Info(const std::string& msg);
+    void Error(const std::string& msg);
 
     Logger(const Logger&) = delete;
     Logger& operator=(const Logger&) = delete;
