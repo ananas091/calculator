@@ -12,7 +12,34 @@
 
 ## Зависимости
 
-Проект использует [MathLib](https://github.com/ananas091/mathlib) для безопасных математических вычислений с обнаружением переполнения.
+Проект использует:
+- [MathLib](https://github.com/ananas091/mathlib) для безопасных математических вычислений с обнаружением переполнения
+- [nlohmann/json](https://github.com/nlohmann/json) для парсинга JSON
+- [Google Test](https://github.com/google/googletest) для тестов
+- [spdlog](https://github.com/gabime/spdlog) — для логирования
+
+## Формат входных данных
+
+Входные данные подаются в формате JSON.
+
+### Бинарные операции (+, -, *, /, ^)
+
+```json
+{
+    "operand1": 10,
+    "operation": "+",
+    "operand2": 5
+}
+```
+
+### Унарная операция (факториал)
+
+```json
+{
+    "operand1": 5,
+    "operation": "!"
+}
+```
 
 ## Сборка
 
@@ -32,14 +59,46 @@ cmake -DCMAKE_BUILD_TYPE=Debug ..
 cmake --build .
 ```
 
+## Тестирование
+
+```bash
+ctest --test-dir build
+```
+
+
 ### Установка
 
 ```bash
 cmake --build . --target install
 ```
 
-### Запуск справки
+## Использование
+
+### JSON строка напрямую
 
 ```bash
-./calculator -h или --help
+./calculator '{"operand1": 10, "operation": "+", "operand2": 5}'
+# Вывод: 15
+
+./calculator '{"operand1": 5, "operation": "!"}'
+# Вывод: 120
 ```
+
+### JSON из файла
+
+```bash
+echo '{"operand1": 100, "operation": "/", "operand2": 4}' > input.json
+./calculator -f input.json
+# Вывод: 25
+```
+
+### Справка
+
+```bash
+./calculator -h
+./calculator --help
+```
+
+## Логирование
+
+Логи пишутся в `/tmp/calculator.log` с уровнем `debug`. Пример:
