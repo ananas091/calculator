@@ -8,7 +8,7 @@
 
 int Runner::Run(int argc, char* argv[]) {
     auto& log = Logger::Instance();
-    log.Info("старт работы калькулятора");
+    log.Info("calculator start");
     try {
         CalculationData data;
 
@@ -17,15 +17,15 @@ int Runner::Run(int argc, char* argv[]) {
         _calculator.Calculate(data);
         Printer::PrintResult(data);
 
-        log.Info(std::format("вычисление завершено успешно, результат: {}", data.result));
+        log.Info(std::format("calculation completed successfully, result: {}", data.result));
 
     } catch (const HelpRequestedException&) {
-        log.Info("запрошена справка");
+        log.Info("help requested");
         Printer::PrintUsage(argv[0]);
         return 0;
 
     } catch (const std::exception& e) {
-        log.Error(std::format("ошибка: {}", e.what()));
+        log.Error(std::format("error: {}", e.what()));
         Printer::PrintError(e.what());
         return 1;
     }

@@ -6,7 +6,7 @@
 
 void Calculator::Calculate(CalculationData& data) {
     auto& log = Logger::Instance();
-    log.Debug("выполнение вычисления");
+    log.Debug("start calculation");
 
     switch (data.operation) {
         case Operation::OP_ADD:
@@ -34,10 +34,10 @@ void Calculator::Calculate(CalculationData& data) {
             break;
 
         default:
-            throw std::invalid_argument("неизвестная операция");
+            throw std::invalid_argument("unknown operation");
     }
 
     if (data.error != mathlib::MATH_OK) throw std::runtime_error(mathlib::math_error_string(data.error));
 
-    log.Debug(std::format("результат: {}", data.result));
+    log.Debug(std::format("result: {}", data.result));
 }

@@ -28,51 +28,51 @@ void Parser::ParseJson(const std::string& json_str, CalculationData& data) {
     data.error = mathlib::MATH_OK;
 
     auto& log = Logger::Instance();
-    log.Debug(std::format("парсинг JSON: {}", json_str));
+    log.Debug(std::format("parsing JSON: {}", json_str));
 
     try {
         nlohmann::json j = nlohmann::json::parse(json_str);
 
         if (!j.contains("operation")) {
-            throw std::invalid_argument("отсутствует поле 'operation'");
+            throw std::invalid_argument("missing field 'operation'");
         }
 
         std::string op_str = j["operation"].get<std::string>();
         data.operation = ParseOperation(op_str);
 
         if (data.operation == Operation::OP_UNKNOWN) {
-            throw std::invalid_argument("неизвестная операция '" + op_str + "'. Доступные операции: + - * / ^ !");
+            throw std::invalid_argument("unknown operation '" + op_str + "'. Available operations: + - * / ^ !");
         }
 
         if (!j.contains("operand1")) {
-            throw std::invalid_argument("отсутствует поле 'operand1'");
+            throw std::invalid_argument("missing field 'operand1'");
         }
 
         if (!j["operand1"].is_number()) {
-            throw std::invalid_argument("'operand1' должен быть числом");
+            throw std::invalid_argument("'operand1' must be a number");
         }
         data.first_number = j["operand1"].get<double>();
 
         if (data.operation != Operation::OP_FACT) {
             if (!j.contains("operand2")) {
-                throw std::invalid_argument("отсутствует поле 'operand2' для бинарной операции");
+                throw std::invalid_argument("missing field 'operand2' for binary operation");
             }
 
             if (!j["operand2"].is_number()) {
-                throw std::invalid_argument("'operand2' должен быть числом");
+                throw std::invalid_argument("'operand2' must be a number");
             }
             data.second_number = j["operand2"].get<double>();
         }
 
-        log.Debug(std::format("парсинг успешен: operand1={}, operation='{}', operand2={}", data.first_number, op_str,
+        log.Debug(std::format("parsing successful: operand1={}, operation='{}', operand2={}", data.first_number, op_str,
                               data.second_number));
 
     } catch (const std::invalid_argument&) {
         throw;
     } catch (const nlohmann::json::parse_error& e) {
-        throw std::invalid_argument(std::string("ошибка парсинга JSON: ") + e.what());
+        throw std::invalid_argument(std::string("JSON parse error: ") + e.what());
     } catch (const nlohmann::json::type_error& e) {
-        throw std::invalid_argument(std::string("ошибка типа JSON: ") + e.what());
+        throw std::invalid_argument(std::string("JSON type error: ") + e.what());
     } catch (const std::exception& e) {
         throw std::runtime_error(e.what());
     }
@@ -80,11 +80,11 @@ void Parser::ParseJson(const std::string& json_str, CalculationData& data) {
 
 void Parser::ParseArguments(int argc, char* argv[], CalculationData& data) {
     auto& log = Logger::Instance();
-    log.Debug("парсинг аргументов");
+    log.Debug("parsing arguments");
 
     if (argc < 2) {
-        throw std::invalid_argument(std::string("недостаточно аргументов. Используйте: ") + argv[0] +
-                                    " -h или --help для подробной информации");
+        throw std::invalid_argument(std::string("not enough arguments. Use: ") + argv[0] +
+                                    " -h или --help for details");
     }
 
     if (CheckHelp(argc, argv)) {
@@ -96,17 +96,17 @@ void Parser::ParseArguments(int argc, char* argv[], CalculationData& data) {
     if (argc == 2) {
         json_input = argv[1];
     } else if (argc == 3 && std::string(argv[1]) == "-f") {
-        log.Debug(std::format("чтение из файла: {}", argv[2]));
+        log.Debug(std::format("reading from file: {}", argv[2]));
         std::ifstream file(argv[2]);
         if (!file.is_open()) {
-            throw std::runtime_error(std::string("не удалось открыть файл '") + argv[2] + "'");
+            throw std::runtime_error(std::string("failed to open file '") + argv[2] + "'");
         }
         std::stringstream buffer;
         buffer << file.rdbuf();
         json_input = buffer.str();
     } else {
-        throw std::invalid_argument(std::string("неправильное количество аргументов. Используйте: ") + argv[0] +
-                                    " -h или --help для подробной информации");
+        throw std::invalid_argument(std::string("invalid number of arguments. Use: ") + argv[0] +
+                                    " -h или --help for details");
     }
 
     ParseJson(json_input, data);
